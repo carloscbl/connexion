@@ -35,6 +35,10 @@ def test_api():
     api4 = FlaskApi(TEST_FOLDER / "fixtures/simple/openapi.yaml")
     assert api4.blueprint.name == '/v1_0'
     assert api4.blueprint.url_prefix == '/v1.0'
+    
+    api5 = FlaskApi(TEST_FOLDER / "fixtures/simple/v3.1/openapi.yaml")
+    assert api5.blueprint.name == '/v1_0'
+    assert api5.blueprint.url_prefix == '/v1.0'
 
 
 def test_api_base_path_slash():

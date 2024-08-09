@@ -185,7 +185,10 @@ class Specification(Mapping):
         version = cls._get_spec_version(spec)
         if version < (3, 0, 0):
             return Swagger2Specification(spec)
-        return OpenAPISpecification(spec)
+        elif version < (3, 1, 0):
+            return OpenAPISpecification(spec)
+        else:
+            return OpenAPI31Specification(spec)
 
     def clone(self):
         return type(self)(copy.deepcopy(self._raw_spec))
@@ -299,3 +302,17 @@ class OpenAPISpecification(Specification):
         user_servers = [{'url': base_path}]
         self._raw_spec['servers'] = user_servers
         self._spec['servers'] = user_servers
+
+
+
+class OpenAPI31Specification(OpenAPISpecification):
+    """Python interface for an OpenAPI 3.1 specification."""
+
+    yaml_name = "openapi.yaml"
+    operation_cls = OpenAPIOperation
+
+    openapi_schema = json.loads(
+        pkgutil.get_data("connexion", "resources/schemas/v3.1/schema.json")  # type: ignore
+    )
+
+
