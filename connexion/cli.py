@@ -16,20 +16,15 @@ from connexion.mock import MockResolver
 logger = logging.getLogger('connexion.cli')
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 FLASK_APP = 'flask'
-AIOHTTP_APP = 'aiohttp'
 AVAILABLE_SERVERS = {
     'flask': [FLASK_APP],
     'gevent': [FLASK_APP],
-    'tornado': [FLASK_APP],
-    'aiohttp': [AIOHTTP_APP]
 }
 AVAILABLE_APPS = {
     FLASK_APP: 'connexion.apps.flask_app.FlaskApp',
-    AIOHTTP_APP: 'connexion.apps.aiohttp_app.AioHttpApp'
 }
 DEFAULT_SERVERS = {
     FLASK_APP: FLASK_APP,
-    AIOHTTP_APP: AIOHTTP_APP
 }
 
 
@@ -39,11 +34,6 @@ def validate_server_requirements(ctx, param, value):
             import gevent  # NOQA
         except ImportError:
             fatal_error('gevent library is not installed')
-    elif value == 'tornado':
-        try:
-            import tornado  # NOQA
-        except ImportError:
-            fatal_error('tornado library is not installed')
     else:
         return value
 
@@ -153,11 +143,6 @@ def run(spec_file,
         )
         raise click.UsageError(message)
 
-    if app_framework == AIOHTTP_APP:
-        try:
-            import aiohttp  # NOQA
-        except Exception:
-            fatal_error('aiohttp library is not installed')
 
     logging_level = logging.WARN
     if verbose > 0:

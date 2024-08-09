@@ -17,7 +17,4 @@ try:
 except ImportError as err:  # pragma: no cover
     FlaskSecurityHandlerFactory = not_installed_error(err)
 
-try:
-    from .aiohttp_security_handler_factory import AioHttpSecurityHandlerFactory
-except ImportError as err:  # pragma: no cover
-    AioHttpSecurityHandlerFactory = not_installed_error(err)
+

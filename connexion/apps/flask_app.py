@@ -7,10 +7,18 @@ import logging
 import pathlib
 from decimal import Decimal
 from types import FunctionType  # NOQA
+import dataclasses
+import decimal
+import json
+import uuid
+from datetime import date
+import orjson
 
 import flask
 import werkzeug.exceptions
-from flask import json, signals
+from flask import signals
+import json
+from flask.json.provider import JSONProvider, DefaultJSONProvider
 
 from ..apis.flask_api import FlaskApi
 from ..exceptions import ProblemException
@@ -33,7 +41,7 @@ class FlaskApp(AbstractApp):
 
     def create_app(self):
         app = flask.Flask(self.import_name, **self.server_args)
-        app.json_encoder = FlaskJSONEncoder
+        app.json = ORJSONProvider(app)
         app.url_map.converters['float'] = NumberConverter
         app.url_map.converters['int'] = IntegerConverter
         return app
@@ -126,18 +134,6 @@ class FlaskApp(AbstractApp):
         if self.server == 'flask':
             self.app.run(self.host, port=self.port, debug=self.debug,
                          extra_files=self.extra_files, **options)
-        elif self.server == 'tornado':
-            try:
-                import tornado.httpserver
-                import tornado.ioloop
-                import tornado.wsgi
-            except ImportError:
-                raise Exception('tornado library not installed')
-            wsgi_container = tornado.wsgi.WSGIContainer(self.app)
-            http_server = tornado.httpserver.HTTPServer(wsgi_container, **options)
-            http_server.listen(self.port, address=self.host)
-            logger.info('Listening on %s:%s..', self.host, self.port)
-            tornado.ioloop.IOLoop.instance().start()
         elif self.server == 'gevent':
             try:
                 import gevent.pywsgi
@@ -150,9 +146,10 @@ class FlaskApp(AbstractApp):
             raise Exception(f'Server {self.server} not recognized')
 
 
-class FlaskJSONEncoder(json.JSONEncoder):
-    def default(self, o):
+def _default( o):
+        print("BBBBB", o)
         if isinstance(o, datetime.datetime):
+            print("AAAAA", o.tzinfo)
             if o.tzinfo:
                 # eg: '2015-09-25T23:14:42.588601+00:00'
                 return o.isoformat('T')
@@ -166,9 +163,51 @@ class FlaskJSONEncoder(json.JSONEncoder):
 
         if isinstance(o, Decimal):
             return float(o)
+        
+        # if isinstance(o, date):
+        #     return http_date(o)
 
-        return json.JSONEncoder.default(self, o)
+        if isinstance(o, (decimal.Decimal, uuid.UUID)):
+            return str(o)
 
+        if dataclasses and dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+
+        if hasattr(o, "__html__"):
+            return str(o.__html__())
+        
+        # try:
+        #     return str(o)
+        # except Exception as e:
+        logging.error(f"Error serializing object {o}", exc_info=True)
+        raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+
+
+# class ORJSONProvider(JSONProvider):
+#     def __init__(self, *args, **kwargs):
+#         self.options = kwargs
+#         super().__init__(*args, **kwargs)
+
+#     def defaultfunc(self, o):
+#         return _default(o)
+    
+#     def loads(self, s, **kwargs):
+#         return orjson.loads(s )
+    
+    
+#     def dumps(self, obj, **kwargs):
+#         # decode back to str, as orjson returns bytes
+#         return orjson.dumps(obj, option=orjson.OPT_NON_STR_KEYS, default=self.defaultfunc ).decode('utf-8')
+    
+import typing as t
+class ORJSONProvider(DefaultJSONProvider):
+
+    default: t.Callable[[t.Any], t.Any] = staticmethod(_default)  # type: ignore[assignment]
+
+    
+class ORJSONEncoderDecoder(ORJSONProvider):
+    def __init__(self, *args, **kwargs):
+        pass
 
 class NumberConverter(werkzeug.routing.BaseConverter):
     """ Flask converter for OpenAPI number type """

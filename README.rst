@@ -522,16 +522,6 @@ installing connexion[swagger-ui], and can be enabled like this:
 Server Backend
 --------------
 
-By default Connexion uses the Flask_ server. For asynchronous
-applications, you can also use Tornado_ as the HTTP server. To do
-this, set your server to ``tornado``:
-
-.. code-block:: python
-
-    import connexion
-
-    app = connexion.App(__name__, specification_dir='swagger/')
-    app.run(server='tornado', port=8080)
 
 You can use the Flask WSGI app with any WSGI container, e.g. `using
 Flask with uWSGI`_ (this is common):
@@ -540,17 +530,6 @@ Flask with uWSGI`_ (this is common):
 
     app = connexion.App(__name__, specification_dir='swagger/')
     application = app.app # expose global WSGI application object
-
-You can use the ``aiohttp`` framework as server backend as well:
-
-.. code-block:: python
-
-    import connexion
-
-    app = connexion.AioHttpApp(__name__, specification_dir='swagger/')
-    app.run(port=8080)
-
-.. note:: Also check aiohttp handler examples_.
 
 Set up and run the installation code:
 
@@ -563,7 +542,6 @@ See the `uWSGI documentation`_ for more information.
 
 .. _using Flask with uWSGI: http://flask.pocoo.org/docs/latest/deploying/uwsgi/
 .. _uWSGI documentation: https://uwsgi-docs.readthedocs.org/
-.. _examples: https://docs.aiohttp.org/en/stable/web.html#handler
 
 
 Documentation
@@ -628,7 +606,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 .. _swager.spec.security_requirement: https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#security-requirement-object
 .. _YAML format: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#format
 .. _token information: https://tools.ietf.org/html/rfc6749
-.. _Tornado: http://www.tornadoweb.org/en/stable/
 .. _Connexion Pet Store Example Application: https://github.com/hjacobs/connexion-example
 .. _described by Flask: http://flask.pocoo.org/snippets/111/
 .. _werkzeug: http://werkzeug.pocoo.org/

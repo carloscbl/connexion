@@ -233,7 +233,7 @@ class FlaskApi(AbstractAPI):
         :rtype: ConnexionRequest
         """
         context_dict = {}
-        setattr(flask._request_ctx_stack.top, 'connexion_context', context_dict)
+        setattr(flask.g, 'connexion_context', context_dict)
         flask_request = flask.request
         request = ConnexionRequest(
             flask_request.url,
@@ -265,7 +265,7 @@ class FlaskApi(AbstractAPI):
 
 
 def _get_context():
-    return getattr(flask._request_ctx_stack.top, 'connexion_context')
+    return getattr(flask.g, 'connexion_context')
 
 
 context = LocalProxy(_get_context)

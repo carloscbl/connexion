@@ -25,7 +25,7 @@ install_requires = [
     'PyYAML>=5.1,<7',
     'requests>=2.9.1,<3',
     'inflection>=0.3.1,<0.6',
-    'werkzeug>=1.0,<2.3',
+    'werkzeug>=1.0,<4.3',
     'importlib-metadata>=1 ; python_version<"3.8"',
     'packaging>=20',
 ]
@@ -33,27 +33,19 @@ install_requires = [
 swagger_ui_require = 'swagger-ui-bundle>=0.0.2,<0.1'
 
 flask_require = [
-    'flask>=1.0.4,<2.3',
+    'flask>=1.0.4,<4.3',
     'itsdangerous>=0.24',
-]
-aiohttp_require = [
-    'aiohttp>=2.3.10,<4',
-    'aiohttp-jinja2>=0.14.0,<2',
-    'MarkupSafe>=0.23',
 ]
 
 tests_require = [
     'decorator>=5,<6',
-    'pytest>=6,<7',
-    'pytest-cov>=2,<3',
+    'pytest<9,>=7',
+    'pytest-cov>=3,<5',
     'testfixtures>=6,<7',
     *flask_require,
     swagger_ui_require
 ]
 
-tests_require.extend(aiohttp_require)
-tests_require.append('pytest-aiohttp')
-tests_require.append('aiohttp-remotes')
 
 docs_require = [
     'sphinx-autoapi==1.8.1'
@@ -67,7 +59,17 @@ class PyTest(TestCommand):
     def initialize_options(self):
         TestCommand.initialize_options(self)
         self.cov = None
-        self.pytest_args = ['--cov', 'connexion', '--cov-report', 'term-missing', '-v']
+        self.pytest_args = [
+            '--cov', 'connexion',
+            '--cov-report', 'term-missing',
+            '-vv',
+            '--capture', 'tee-sys',
+            '-o', 'log_cli=true',  # Combine into 'log_cli=true'
+            '-o', 'log_cli_level=INFO',  # Combine into 'log_cli_level=INFO'
+            '--durations', '10',
+            '-rxXs',
+            'tests/test_cli.py'
+        ]
         self.cov_html = False
 
     def finalize_options(self):
@@ -108,7 +110,6 @@ setup(
         'tests': tests_require,
         'flask': flask_require,
         'swagger-ui': swagger_ui_require,
-        'aiohttp': aiohttp_require,
         'docs': docs_require
     },
     cmdclass={'test': PyTest},
@@ -119,6 +120,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',

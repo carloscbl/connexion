@@ -86,25 +86,7 @@ You can pass custom Swagger UI `Configuration Parameters`_ like e.g.
 
 Server Backend
 --------------
-By default connexion uses the default flask server but you can also use Tornado_ or gevent_ as the HTTP server, to do so set server
-to ``tornado`` or ``gevent``:
-
-.. code-block:: python
-
-    import connexion
-
-    app = connexion.FlaskApp(__name__, port = 8080, specification_dir='openapi/', server='tornado')
-
-
-Connexion has the ``aiohttp`` framework as server backend too:
-
-.. code-block:: python
-
-    import connexion
-
-    app = connexion.AioHttpApp(__name__, port = 8080, specification_dir='openapi/')
 
 
 .. _Jinja2: http://jinja.pocoo.org/
-.. _Tornado: http://www.tornadoweb.org/en/stable/
 .. _gevent: http://www.gevent.org/

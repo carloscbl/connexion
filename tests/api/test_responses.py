@@ -2,7 +2,7 @@ import json
 from struct import unpack
 
 import yaml
-from connexion.apps.flask_app import FlaskJSONEncoder
+from connexion.apps.flask_app import ORJSONProvider
 from werkzeug.test import Client, EnvironBuilder
 
 
@@ -238,15 +238,17 @@ def test_nested_additional_properties(simple_openapi_app):
 
 
 def test_custom_encoder(simple_app):
-
-    class CustomEncoder(FlaskJSONEncoder):
-        def default(self, o):
-            if o.__class__.__name__ == 'DummyClass':
-                return "cool result"
-            return FlaskJSONEncoder.default(self, o)
+    import typing as t
+    def default__( o):
+        print("CCCCCC",o,o.__class__.__name__)
+        if o.__class__.__name__ == 'DummyClass':
+            return "cool result"
+        return ORJSONProvider.default(o)
+    class CustomEncoder(ORJSONProvider):
+        default: t.Callable[[t.Any], t.Any] = staticmethod(default__)  # type: ignore[assignment]
 
     flask_app = simple_app.app
-    flask_app.json_encoder = CustomEncoder
+    flask_app.json = CustomEncoder(app=flask_app)
     app_client = flask_app.test_client()
 
     resp = app_client.get('/v1.0/custom-json-response')
