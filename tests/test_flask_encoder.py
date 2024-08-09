@@ -4,7 +4,7 @@ import math
 from decimal import Decimal
 
 import pytest
-from connexion.apps.flask_app import ORJSONEncoderDecoder
+from connexion.apps.flask_app import ConnexionJSONEncoderDecoder
 
 from conftest import build_app_from_fixture
 
@@ -12,19 +12,19 @@ SPECS = ["swagger.yaml", "openapi.yaml"]
 
 
 def test_json_encoder():
-    s = ORJSONEncoderDecoder().dumps({1: 2})
+    s = ConnexionJSONEncoderDecoder().dumps({1: 2})
     assert '{"1": 2}' == s
 
-    s = ORJSONEncoderDecoder().dumps(datetime.date.today())
+    s = ConnexionJSONEncoderDecoder().dumps(datetime.date.today())
     assert len(s) == 12
 
-    s = ORJSONEncoderDecoder().dumps(datetime.datetime.utcnow())
+    s = ConnexionJSONEncoderDecoder().dumps(datetime.datetime.now())
     assert s.endswith('Z"')
 
-    s = ORJSONEncoderDecoder().dumps(Decimal(1.01))
+    s = ConnexionJSONEncoderDecoder().dumps(Decimal(1.01))
     assert s == '1.01'
 
-    s = ORJSONEncoderDecoder().dumps(math.expm1(1e-10))
+    s = ConnexionJSONEncoderDecoder().dumps(math.expm1(1e-10))
     assert s == '1.00000000005e-10'
 
 
@@ -38,7 +38,7 @@ def test_json_encoder_datetime_with_timezone():
         def dst(self, dt):
             return datetime.timedelta(0)
 
-    s = ORJSONEncoderDecoder().dumps(datetime.datetime.now(DummyTimezone()))
+    s = ConnexionJSONEncoderDecoder().dumps(datetime.datetime.now(DummyTimezone()))
     assert s.endswith('+00:00"')
 
 

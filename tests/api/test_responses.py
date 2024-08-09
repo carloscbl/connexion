@@ -2,7 +2,7 @@ import json
 from struct import unpack
 
 import yaml
-from connexion.apps.flask_app import ORJSONProvider
+from connexion.apps.flask_app import ConnexionJSONProvider
 from werkzeug.test import Client, EnvironBuilder
 
 
@@ -243,8 +243,8 @@ def test_custom_encoder(simple_app):
         print("CCCCCC",o,o.__class__.__name__)
         if o.__class__.__name__ == 'DummyClass':
             return "cool result"
-        return ORJSONProvider.default(o)
-    class CustomEncoder(ORJSONProvider):
+        return ConnexionJSONProvider.default(o)
+    class CustomEncoder(ConnexionJSONProvider):
         default: t.Callable[[t.Any], t.Any] = staticmethod(default__)  # type: ignore[assignment]
 
     flask_app = simple_app.app

@@ -41,7 +41,8 @@ tests_require = [
     'decorator>=5,<6',
     'pytest<9,>=7',
     'pytest-cov>=3,<5',
-    'testfixtures>=6,<7',
+    'testfixtures>=6,<9',
+    'pytest-xdist>3',
     *flask_require,
     swagger_ui_require
 ]
@@ -62,13 +63,15 @@ class PyTest(TestCommand):
         self.pytest_args = [
             '--cov', 'connexion',
             '--cov-report', 'term-missing',
-            '-vv',
-            '--capture', 'tee-sys',
-            '-o', 'log_cli=true',  # Combine into 'log_cli=true'
-            '-o', 'log_cli_level=INFO',  # Combine into 'log_cli_level=INFO'
-            '--durations', '10',
-            '-rxXs',
-            'tests/test_cli.py'
+            '-v',
+            '-n12'
+            # '-vv',
+            # '--capture', 'tee-sys',
+            # '-o', 'log_cli=true',  # Combine into 'log_cli=true'
+            # '-o', 'log_cli_level=INFO',  # Combine into 'log_cli_level=INFO'
+            # '--durations', '10',
+            # '-rxXs',
+            # 'tests/test_cli.py'
         ]
         self.cov_html = False
 

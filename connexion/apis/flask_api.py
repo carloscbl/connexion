@@ -37,6 +37,8 @@ class FlaskApi(AbstractAPI):
     def _set_blueprint(self):
         logger.debug('Creating API blueprint: %s', self.base_path)
         endpoint = flask_utils.flaskify_endpoint(self.base_path)
+        if not endpoint:
+            endpoint = "/"
         self.blueprint = flask.Blueprint(endpoint, __name__, url_prefix=self.base_path,
                                          template_folder=str(self.options.openapi_console_ui_from_dir))
 

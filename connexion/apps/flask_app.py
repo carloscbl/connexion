@@ -41,7 +41,7 @@ class FlaskApp(AbstractApp):
 
     def create_app(self):
         app = flask.Flask(self.import_name, **self.server_args)
-        app.json = ORJSONProvider(app)
+        app.json = ConnexionJSONProvider(app)
         app.url_map.converters['float'] = NumberConverter
         app.url_map.converters['int'] = IntegerConverter
         return app
@@ -147,9 +147,7 @@ class FlaskApp(AbstractApp):
 
 
 def _default( o):
-        print("BBBBB", o)
         if isinstance(o, datetime.datetime):
-            print("AAAAA", o.tzinfo)
             if o.tzinfo:
                 # eg: '2015-09-25T23:14:42.588601+00:00'
                 return o.isoformat('T')
@@ -183,29 +181,14 @@ def _default( o):
         raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
 
 
-# class ORJSONProvider(JSONProvider):
-#     def __init__(self, *args, **kwargs):
-#         self.options = kwargs
-#         super().__init__(*args, **kwargs)
-
-#     def defaultfunc(self, o):
-#         return _default(o)
-    
-#     def loads(self, s, **kwargs):
-#         return orjson.loads(s )
-    
-    
-#     def dumps(self, obj, **kwargs):
-#         # decode back to str, as orjson returns bytes
-#         return orjson.dumps(obj, option=orjson.OPT_NON_STR_KEYS, default=self.defaultfunc ).decode('utf-8')
     
 import typing as t
-class ORJSONProvider(DefaultJSONProvider):
+class ConnexionJSONProvider(DefaultJSONProvider):
 
     default: t.Callable[[t.Any], t.Any] = staticmethod(_default)  # type: ignore[assignment]
 
     
-class ORJSONEncoderDecoder(ORJSONProvider):
+class ConnexionJSONEncoderDecoder(ConnexionJSONProvider):
     def __init__(self, *args, **kwargs):
         pass
 

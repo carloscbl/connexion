@@ -47,7 +47,9 @@ def create_spec_validator(spec: dict) -> Draft4Validator:
         if not valid:
             return
         if isinstance(instance, dict) and 'default' in instance:
-            for error in instance_validator.iter_errors(instance['default'], instance):
+            
+            for error in instance_validator.evolve(schema=schema).iter_errors(instance['default'], instance):
+            # for error in instance_validator.iter_errors(instance['default'], instance):
                 yield error
 
     SpecValidator = extend_validator(Draft4Validator, {"properties": validate_defaults})

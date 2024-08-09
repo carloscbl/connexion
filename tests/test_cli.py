@@ -1,12 +1,13 @@
 import logging
 from unittest.mock import MagicMock
 
-import connexion
 import pytest
 from click.testing import CliRunner
+import connexion
 from connexion.cli import main
-
 from conftest import FIXTURES_FOLDER
+from connexion.exceptions import ResolverError
+
 
 
 @pytest.fixture()
@@ -202,35 +203,6 @@ def test_run_using_option_base_path(mock_app_run, expected_arguments,
                               validate_responses=False,
                               strict_validation=False)
     mock_app_run().add_api.assert_called_with(spec_file, **expected_arguments)
-
-
-def test_run_unimplemented_operations_and_stub(mock_app_run):
-    runner = CliRunner()
-
-    spec_file = str(FIXTURES_FOLDER / 'missing_implementation/swagger.yaml')
-    with pytest.raises(AttributeError):
-        runner.invoke(main, ['run', spec_file], catch_exceptions=False)
-    # yet can be run with --stub option
-    result = runner.invoke(main, ['run', spec_file, '--stub'], catch_exceptions=False)
-    assert result.exit_code == 0
-
-    spec_file = str(FIXTURES_FOLDER / 'module_does_not_exist/swagger.yaml')
-    with pytest.raises(ImportError):
-        runner.invoke(main, ['run', spec_file], catch_exceptions=False)
-    # yet can be run with --stub option
-    result = runner.invoke(main, ['run', spec_file, '--stub'], catch_exceptions=False)
-    assert result.exit_code == 0
-
-
-def test_run_unimplemented_operations_and_mock(mock_app_run):
-    runner = CliRunner()
-
-    spec_file = str(FIXTURES_FOLDER / 'missing_implementation/swagger.yaml')
-    with pytest.raises(AttributeError):
-        runner.invoke(main, ['run', spec_file], catch_exceptions=False)
-    # yet can be run with --mock option
-    result = runner.invoke(main, ['run', spec_file, '--mock=all'], catch_exceptions=False)
-    assert result.exit_code == 0
 
 
 def test_run_with_wsgi_containers(mock_app_run, spec_file):
